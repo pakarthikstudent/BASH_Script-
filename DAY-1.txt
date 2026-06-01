@@ -1,0 +1,849 @@
+
+OS 
+ - System software 
+ - Interface between user and hardware
+ 
+ +-----------------------+
+ | User Web Zoom PPT Appln...
+ +-----------------------+
+ | OS - Kernel
+ +-----------------------+
+ | H/W: CPU RAM HD NIC ..
+ +-----------------------+
+
+ - Kernel - Core part of an OS
+   |
+  File,Process 
+
+- UNIX - AT&T 
+       - 1950...1969.. 1971/72  
+
+  - 1945...
+    
+     X-10        X-11
+     |            |
+     PDL1        PDL2
+     |__ OS-A     |__OS-B
+ 
+   X10 X11 ..X80 X86
+    |_____|___|___|
+	  |
+	 OS-X
+
+ - GNU Project - 1983 
+    |->GNU -> gcc
+       g++
+       gdb
+       gzip
+       bash
+       ...
+ - MinixOS - like Unix-like OS
+   =======
+       |->Linus Torvald 
+
+  OS  Vs Kernel 
+  --     ---------
+
+ Unix=> OS = Utilities + Kernel 
+                         -------
+
+ Kernel ---> GNULinux Kernel - 1991
+
+Distributors => Software Tools + Kernel => OS (Ex: RedHatLinux ; Debian Linux; Ubunut ;Oracle Linux)
+
+-----------------------
+Shell - Interface between User and Kernel
+|
+|-->Command 
+
+Login as:  karthik
+Password:  ....
+
+karthik@host01~]$ 
+------------------//Primary prompt
+
+
+Login as:  anu
+Password:  ....
+
+anu@host02~]$ 
+------------------//Primary prompt
+
+
+Login as: root
+Password:
+
+root@host01~]#
+-----------------------//Primary prompt 
+
+
+User 
+|
+command //
+|
+shell <===
+|
+-------------
+Kernel 
+|
+-----------
+H/W
+
+
+[User]-->[Command]--->[Shell]--->|Kernel|->H/W
+================================= ======   ====
+
+Shell 
+------
+ ->Interface between user and kernel 
+ -> Types of shell
+    |
+   1.BourneShell (sh) 
+   2.KornShell (ksh)
+
+   3.BourneAgainSHell(BASH) - GNUProject - default Linux shell
+   
+   4. CShell (CSH) ->tcsh ->expect ..
+   5. ZSH
+
+=> How to test current working shell?
+
+    ps (or) echo $0 
+
+=> How to check list of available shells in Linux?
+
+   cat  /etc/shells 
+
+Login: bibu
+password: ....
+
+bibu@host01~]$ echo $0
+zsh
+bibu@host01~]$ date <== by zsh shell
+
+How to switch from zsh shell to bash shell?
+
+bibu@host01~]$ bash {Enter}
+
+bibu@host01~]$ ...
+bibu@host01~]$ echo $0
+bash
+
+
+#!/bin/bash 
+....
+....
+....
+.... // interpreted by bash
+....
+
+Task
+-----
+1. open a terminal
+2. check your login name  - whoami
+3. display current process details - ps
+4. echo $0
+5. date 
+   cal
+   hostname
+
+6. cat  /etc/shells
+ 
+7. clear (or) Ctrl+L 
+=========================================================================
+Shell Script
+===== -------
+	|-> variable
+	|-> operators
+	|-> conditional statements 
+	|-> looping statements
+	|-> command redirection -> FileHandling 
+	|-> function
+	|-> filters (commands) + Regular Expression //commandlines
+	|-> Heredocument 
+
+=========================================================================
+File - Data - Under the storage unit
+-----
+  
+ Directory structure  - tree structure
+-----------------------
+ 	
+		/ <== root directory - like MyComputer
+		|
+	--------------------------------------------
+	|	|	|	|	..	|
+	/bin
+
+
+/bin
+/usr/bin
+/sbin
+
+which <command>
+|
+whatis <command>
+
+
+Task
+------
+ls {Enter}
+
+whatis ls (or) man ls
+
+man ls
+
+-a
+-l
+
+q <-- quit
+----------------
+ls
+
+1st -> command
+2nd -> command -option
+		|--> 1 or more 
+
+commandA -abcd
+
+1st ->commandA
+2nd ->commandA -a
+      commandA -b
+      commandA -c
+      commandA -d
+
+3rd -> We can combine all the options
+-------------------------------------------------------------------------------------
+ls
+
+ls -ltr
+ls -trl
+ls -lrt 
+  -------//SAME 
+-------------------------------------------------------------------------------------
+read	-> r
+write	-> w
+execute -> x
+
+To assign a file permission 
+=> chmod user_details + mode filename
+         		
+vi filename {Enter}
+
+(1) - commandmode - Save Copy Paste Delete ..
+      |
+   press 'i' (or) Insert <-- (2)
+   -----------------------
+	|->insert mode (or) input model - type our text
+	    |
+	   press ESC
+	    |
+	 commandmode :w <-- write
+		     :wq <--- write and quit <-- (3)
+
+cat filename <-- read only
+
+To assign user execute permission to file
+chmod u + x filename
+
+
+To run/execute this file
+
+1. absolute path => starts from / directory
+ <or>
+2. relative path  => ./<filename> 
+4	2	1
+r	w	x
+1	1	1  => 7
+1	1	0  => 6
+1	0	1  => 5
+1	0	0  => 4
+0	0	0  => 0 
+
+chmod 756 filename
+      ---
+7 ->user   => rwx
+5 ->group  => r-x
+6 ->others => rw- 
+-------------------------------------------------------------------------
+
+command ->o/p --> display to monitor
+	  ---------------------------
+		|->Success => STDOUT
+		|->Error   => STDERR
+
+root@host~]$ date ->o/p =>STDOUT
+
+root@host~]$ datee ->command not found //Error => STDERR
+
+FileDescriptior (FD) -> int
+
+
+FD = 0  <== Input - <STDIN> 
+FD = 1  => STDOUT - Monitor
+FD = 2  => STDERR - Monitor
+---------//pre-defined file descriptior 
+
+@@@@
+  User -> command -->shell --> | systemcall() = FD ->file system ... |
+@@@@
+
+-------------------------------------------------------------------------
+
+To learn the script/programming 
+------------------------------------
+Step 1: Understand the topic definition
+Step 2: Understand the topic syntax
+Step 3: Refer an existing example
+Step 4: Exercise 
+
+Variable
+=========
+variable - placeholder <or> label - holding a value
+					      -----
+To initialize 
+---------------
+variableName=value
+^^^^^^^^^^^^
+ |-> 1. variableName is user defined 
+ 	------------
+	  |->Name starts with A-Za-z_ (not starts with digit)
+	  |->Not allows space/specialchars 
+
+ 	port=3036
+	os="Linux"  
+	Fname="/etc/f1.conf"
+	LB=0.98
+	IP="192.168.1.100"	
+
+ |->2. There is no space in = LHS,RHS
+
+
+   port = 5000 # Error
+   port= 5000 # Error
+   port =5000 # Error
+   $fname="p1.log" # Error
+   5var=120   # Error  Vs var5=120 # OK
+
+   server_name="Linux" # OK
+
+ls -l demo1.txt
+-rwxr-xr--. 1 root root 108 Jun  1 15:58 demo1.txt
+
+fname="demo1.txt"
+fsize=108
+fowner="root"
+fperm="rwxrw-r--"
+
+$VariableName (or) ${VariableName}
+-=============     -==============
+[root@node2 ~]# fname="demo1.txt"
+[root@node2 ~]#
+[root@node2 ~]# echo $fname
+demo1.txt
+[root@node2 ~]# echo fname
+fname
+[root@node2 ~]# echo ${fname}
+demo1.txt
+[root@node2 ~]# echo "File name is:$fname"
+File name is:demo1.txt
+[root@node2 ~]#
+[root@node2 ~]# ls -l $fname
+-rwxr-xr--. 1 root root 108 Jun  1 15:58 demo1.txt
+[root@node2 ~]#
+------------------------------------------------------------------------
+mkdir HandsOn
+cd HandsOn
+
+Task-1
+------
+initialize app name,port number,config file to individual variable
+using echo - display app details in below format
+
+App name is:WebApp
+WebApp running port number:8080
+WebApp config file is:/etc/web/app.cfg
+
+
+app_name="WebApp"
+app_port=8080
+config_fname="/etc/web/app.cfg"
+
+echo "App name is:$app_name"
+echo "$app_name running port number is:$app_port"
+echo "$app_name config file is:$config_fname"
+
+# Vs
+
+echo "App name is:$app_name
+---------------------------------
+$app_name running port number is:$app_port
+--------------------------------------------
+$app_name config file is:$config_fname
+----------------------------------------"
+----------------------------------------------------------------------
+Unix/Linux commandline structures
+
+1. command only 
+2. command with arguments style 
+|
+3. command argument is another_command => command `command` <-- backquote `
+
+
+student@paka:~$ ps -e|wc -l
+25
+student@paka:~$ echo "Total no.of process count:`ps -e|wc -l`"
+Total no.of process count:26
+student@paka:~$
+student@paka:~$ uname
+Linux
+student@paka:~$ echo "My Working Kernel name is:`uname`"
+My Working Kernel name is:Linux
+student@paka:~$
+
+How to initialize command result to UDV (User defined Variable) ?
+
+my_os=`uname` <== this is NOT a single quote('') 
+|     -------
+|         |<=== this is backquote `command`
+echo $my_os -> Linux
+
+Task-2
+-------
+Initialize following system commands results to individual variable
+display kernel name (uname)
+display kernel version (uname -r)
+display Login name (whoami)
+display hostname (hostname)
+dispaly today date (MM/DD/YYYY) <-- date +%D
+
+using echo command - display system details 
+Note: use multiline string
+
+
+os_name=`uname`
+os_version=`uname -r`
+myname=`whoami`
+myhost=`hostname`
+today=`date +%D`
+
+echo "
+---------------------------------------------
+  Working Kernel name:$os_name
+  $os_name version:$os_version
+  -----------------------------------------
+  Hostname is:$myhost Login name is:$myname
+  ------------------------------------------
+ Today date:$today
+----------------------------------------------"
+
+################################################################################################
+
+Keyboard(<STDIN>) -------<----- ShellScript ------>------ echo ------- Monitor (STDOUT/STDERR)
+			read
+
+read UDV 
+Vs
+read -p "User defined prompt"<space>UDV
+
+
+[root@node2 HandsOn]# read var
+data1
+[root@node2 HandsOn]# echo $var
+data1
+[root@node2 HandsOn]# read var
+3456
+[root@node2 HandsOn]# echo $var
+3456
+[root@node2 HandsOn]# read -p "Enter a var value:" var
+Enter a var value:45
+[root@node2 HandsOn]# echo $var
+45
+[root@node2 HandsOn]# echo "var value is:$var"
+var value is:45
+[root@node2 HandsOn]# read -p "Enter App name:" app
+Enter App name:web2.0
+[root@node2 HandsOn]# read -p "Enter $app port number:" port
+Enter web2.0 port number:9090
+[root@node2 HandsOn]#
+
+
+Task-3
+------
+Read a app details from <STDIN>
+|
+initialize app name,port number,config file to individual variable
+using echo - display app details in below format
+
+read -p "Enter an app name:" app_name
+read -p "Enter $app_name port number:" app_port
+read -p "Enter $app_name config filename:" config_fname
+
+echo "App name is:$app_name
+---------------------------------
+$app_name running port number is:$app_port
+--------------------------------------------
+$app_name config file is:$config_fname
+----------------------------------------"
+-------------------------------------------------------
+
+export UDV=Value 
+
+  <or>
+
+ UDV=Value
+ export UDV
+
+
+[root@node2 HandsOn]# ps
+    PID TTY          TIME CMD
+   1351 pts/0    00:00:00 bash
+   1651 pts/0    00:00:00 ps
+[root@node2 HandsOn]# echo "Working Shell:$0 PID:$$"
+Working Shell:-bash PID:1351
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# api_token="AB123"
+[root@node2 HandsOn]# echo $api_token
+AB123
+[root@node2 HandsOn]# sh
+sh-4.4# echo $api_token
+
+sh-4.4# exit
+exit
+[root@node2 HandsOn]# export api_token="AB123"
+[root@node2 HandsOn]# sh
+sh-4.4# echo $api_token
+AB123
+sh-4.4# bash
+[root@node2 HandsOn]# echo $api_token
+AB123
+[root@node2 HandsOn]# ps
+    PID TTY          TIME CMD
+   1351 pts/0    00:00:00 bash
+   1653 pts/0    00:00:00 sh
+   1654 pts/0    00:00:00 bash
+   1675 pts/0    00:00:00 ps
+[root@node2 HandsOn]# echo "Running shell name is:$0 PID:$$"
+Running shell name is:bash PID:1654
+[root@node2 HandsOn]#
+
+--------------------------------------------------------------
+unset
+------
+unset UDV
+
+[root@node2 HandsOn]# port=5000
+[root@node2 HandsOn]# echo $port
+5000
+[root@node2 HandsOn]# unset port
+[root@node2 HandsOn]# echo $port
+
+[root@node2 HandsOn]#
+--------------------------------------------------------------
+Recap
+======
+read UDV
+export UDV
+unset UDV
+---------------------------------------------------------------
+
++------------------------------------------+
+| User:
++-------------------//shell----------------+
+| Kernel - File,Process
++------------------------------------------+
+| H/W
++-------------------------------------------+
+
+
++------------------------------------------+
+| User: date cal ...
++-------------------//shell----------------+
+|                  |
+|            systemcall() = FileDescriptor
+|                  |
+|        FileSystem <----> PCB | IPC | SCHED | Memory | Net |
+|                  |
+|               Device Driver
+|                  |
+|               Device Controller
++------------------------------------------+
+| H/W
++-------------------------------------------+
+
+strace <command>
+----------------------------------------------------------------------------------------------
+$?
+---
+ |-> last command operation exit code (or) status code
+			    ----------     -----------
+command1
+command2
+echo $? <--- command2 execution status(Success/Failed)
+command3
+
+$? -> 0 <== Success
+$? -> non-zero (1 2 3 ... 255) <-- Failed
+
+[root@node2 HandsOn]# date
+Mon Jun  1 19:01:47 IST 2026
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo $?
+0
+[root@node2 HandsOn]# cat pp.log
+cat: pp.log: No such file or directory
+[root@node2 HandsOn]# echo $?
+1
+[root@node2 HandsOn]# asfdsfsf
+-bash: asfdsfsf: command not found
+[root@node2 HandsOn]# echo $?
+127
+[root@node2 HandsOn]# /etc/passwd
+-bash: /etc/passwd: Permission denied
+[root@node2 HandsOn]# echo $?
+126
+[root@node2 HandsOn]# uname;sleep 5;echo ThankYou
+Linux
+ThankYou
+[root@node2 HandsOn]# date;echo $?
+Mon Jun  1 19:03:39 IST 2026
+0
+[root@node2 HandsOn]#
+
+operators
+==========
+1. arithmetic 
+2. relational
+3. logical
+4. file test
+
+1. arithmetic 
+---------------
++ - * / % 
+
+expr - command
+====
+Syntax:-
+-----------
+expr<space>Expression
+	   operand<space>Operator<space>Operand
+
+expr 10 + 20 ->30
+Vs
+expr 10+20 ->10+20 <== like echo
+
+
+[root@node2 HandsOn]# echo 10 + 20
+10 + 20
+[root@node2 HandsOn]# echo 10+20
+10+20
+[root@node2 HandsOn]# expr 10 + 20
+30
+[root@node2 HandsOn]# expr 10+20
+10+20
+[root@node2 HandsOn]# expr 10 + 20
+30
+[root@node2 HandsOn]# v=`expr 10 + 20`
+[root@node2 HandsOn]# echo $v
+30
+[root@node2 HandsOn]# n=5
+[root@node2 HandsOn]# expr $n + 1
+6
+[root@node2 HandsOn]# n=5
+[root@node2 HandsOn]# n=`expr $n + 1`
+[root@node2 HandsOn]# echo $n
+6
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# expr 10 + 20.0
+expr: non-integer argument
+[root@node2 HandsOn]#
+
+Task-4
+-------------
+Write a shell script
+-> read disk partition name from <STDIN> (ex: /dev/xvdb1)
+-> read disk partition size from <STDIN> (ex: 120)
+|
+-> read another disk partition name from <STDIN> (ex: /dev/xvdd1)
+-> read disk partition size from <STDIN> (ex: 200)
+|
+Calculate sum of partition size <==
+|
+-> use - echo - display each input partition name and size
+		display total size
+--------------------------------------------
+read -p "Enter a disk partition1:" p1
+read -p "Enter $p1 size:" s1
+
+read -p "Enter a disk partition1:" p2
+read -p "Enter $p2 size:" s2
+total=`expr $s1 + $s2`
+
+echo "
+Partition: $p1	  Size:$s1
+-------------------------------
+Partition: $p2    Size:$s2
+-------------------------------
+Total Size: $total 
+-------------------------------"
+===============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
