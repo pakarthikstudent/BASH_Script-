@@ -1,0 +1,848 @@
+command `command` <--- backquote 
+ <or>
+command $(command)
+
+echo "My Login name is:`whoami`"
+|
+echo "My Login name is:$(whoami)"
+
+mylogin=`whoami` same as  mylogin=$(whoami)
+-------------
+Arithmetic operations
+------------------------
+1. expr <--- command
+
+<or>
+
+2. $((expression)) <== compound expression - this is not a command
+
+[root@node2 HandsOn]# var=120
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# expr $var + 10
+130
+[root@node2 HandsOn]# r=`expr $var + 10`
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo $r
+130
+[root@node2 HandsOn]# expr $r + 100
+230
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# uname
+Linux
+[root@node2 HandsOn]# echo "My working kernel is:`uname`"
+My working kernel is:Linux
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo "My working kernel is:$(uname)"
+My working kernel is:Linux
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# myos=`uname` # 1
+[root@node2 HandsOn]# echo $myos
+Linux
+[root@node2 HandsOn]# myserver=$(uname) # 2 another way
+[root@node2 HandsOn]# echo $myserver
+Linux
+[root@node2 HandsOn]# expr 10 + 20
+30
+[root@node2 HandsOn]# total=`expr 10 + 20`
+[root@node2 HandsOn]# echo $total
+30
+[root@node2 HandsOn]# echo $((10+20))
+30
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo $((10        +20))
+30
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# va=10
+[root@node2 HandsOn]# vb=15
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# result=`expr $va + $vb`
+[root@node2 HandsOn]# echo $result
+25
+[root@node2 HandsOn]# total=$((va+vb))
+[root@node2 HandsOn]# echo $total
+25
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# n=1
+[root@node2 HandsOn]# n=`expr $n + 1`
+[root@node2 HandsOn]# echo $n
+2
+[root@node2 HandsOn]# n=1
+[root@node2 HandsOn]# ((n++))
+[root@node2 HandsOn]# echo $n
+2
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# expr 10 + 20.0
+expr: non-integer argument
+[root@node2 HandsOn]# echo $((10+20.0))
+-bash: 10+20.0: syntax error: invalid arithmetic operator (error token is ".0")
+[root@node2 HandsOn]#
+
+Task-6:
+---------
+modify p5.sh script 
+expr -> compound style arithmetic $((expression))
+
+cp p5.sh p6.sh
+...
+
+=====================================================================
+$? - last command operation exit code /status code
+
+Relational operators
+---------------------
+	|
+	|--->1. Number 0-9 =>  -eq -ne -lt -le  -gt  -ge 
+	|
+	|--->2. string "A-Za-z0-9spacespecialchar" => == !=
+
+command -> o/p ->Number => `ps -e|wc -l` -gt 100 
+			
+			    `cat filename| wc -l` -eq 5
+
+command -> o/p ->string => `whoami` == "root" 
+			 
+			    "$SHELL" == "/bin/bash"
+
+test (or) [] <== test operator 
+
+test<space>Expression
+ <or>
+[<space>Expression<space>]
+
+test 120 -gt 100
+
+(or)
+
+[ 120 -gt 100 ]
+
+
+
+[root@node2 HandsOn]# test 10 -eq 10
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# [ 10 -eq 10 ]
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# [ 10 -eq 20 ]
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# [ 10 -eq 10 ]
+[root@node2 HandsOn]# echo $?
+0
+[root@node2 HandsOn]# [ 10 -gt 5 ]; echo $?
+0
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# test 10 -gt 5 ;echo $?
+0
+[root@node2 HandsOn]# ps -e|wc -l
+129
+[root@node2 HandsOn]# test `ps -e|wc -l` -gt 100
+[root@node2 HandsOn]# echo $?
+0
+[root@node2 HandsOn]# [ `ps -e|wc -l` -gt 100 ]
+[root@node2 HandsOn]# echo $?
+0
+[root@node2 HandsOn]#
+
+
+[root@node2 HandsOn]# mkdir D1
+[root@node2 HandsOn]# echo $?
+0
+[root@node2 HandsOn]# mkdir D1
+mkdir: cannot create directory ‘D1’: File exists
+[root@node2 HandsOn]# echo $?
+1
+[root@node2 HandsOn]#
+
+Conditional statement
+----------------------
+1. Code block
+2. ------------this code block will execute only one time
+3. Validation/testing
+4. if statement 
+   ============
+   1. if only style
+   2. if else style
+   3. if elif elif elif ... elif else <-- multiconditional 
+
+
+
+1. if only style
+==================
+Syntax:-
+========
+if<space>[<space>Expression<space>]
+then                            
+     True block
+fi                              
+
+2. if else style
+===================
+Syntax:-
+=========
+if<space>[<space>Expression<space>]
+then                            
+     True block
+else
+     False block
+fi 
+
+# if then else fi <--- bash keywords 
+
+
+Task-7:
+-------
+Write a shell script
+Use conditional statement 
+|
+test - user login is root => display top 5 process list  <==   ps -e|head -n 5
+			     display total no.of process count  <== ps -e|wc -l
+	|
+      user login is not-root => display last 5 process list  <===   ps -e|tail -n 5
+				display current working directory <== pwd
+
+if [ "`whoami`" == "root" ]
+then
+	echo "Top 5 process list"
+	ps -e|head -n 5
+	echo "Total no.of process count:`ps -e|wc -l`"
+else
+	echo "Last 5 process list"
+	ps -e|tail -n 5
+	echo "Current working directory:$(pwd)"
+fi
+
+-----------------------------------------------------------------
+Task-8:
+---------
+Write a shell script:
+
+Test => Login is root user or not
+	         =========    ====
+		  |              |---> Test total no.of process count is above 100 or not
+		  |							---------  === display last 10 proce	Test Login Shell is bash not a bash				       |->display top 10 process
+			     |	  |---> display ps command results
+			     |-> Display shell name and Version 
+
+
+if [ "`whoami`" == "root" ]
+then
+	if [ "$SHELL" == "/bin/bash" ]
+	then
+		echo "$SHELL and Version: $BASH_VERSION"
+	else
+		echo "Current process:-"
+		ps
+	fi
+else
+
+	if [ `ps -e|wc -l` -gt 100 ]
+	then
+		echo "Top - 10 process details:-"
+		ps -e|head 
+	else
+		echo "Bottom - 10 process details:-"
+		ps -e|tail
+	fi
+fi
+
+
+3. if elif elif elif ... elif else <-- multiconditional 
+===========================================================
+
+if [ condition1 ]
+then
+     <True block-1>
+elif [ condition2 ]
+then 
+     <True block-2>
+elif [ condition3 ]
+then
+     <True block-3>
+...
+elif [ Condition-N ]
+then
+	...
+else
+	False block
+fi
+
+Task-9
+---------
+Write a shell script
+read a shell from <STDIN>
+|
+test -> input shell is bash => initialize profile filename is /etc/bashrc 
+test -> input shell is ksh => initialize profile filename is /etc/kshrc 
+test -> input shell is csh => initialize profile filename is /etc/cshrc 
+|
+default -> shell name is /bin/nologin and profile filename is /etc/profile 
+
+-> At the end of the line ->display shell name and profile filename
+
+
+read -p "Enter a shell name:" sh_var
+
+if [ "$sh_var" == "bash" ]
+then
+	fname="/etc/bashrc"
+elif [ "$sh_var" == "ksh" ]
+then
+	fname="/etc/kshrc"
+elif [ "$sh_var" == "csh" ]
+then
+	fname="/etc/cshrc"
+else
+	sh_var="/bin/nologin"
+	fname="/etc/profile"
+fi
+
+echo " Shell name : $sh_var and profile filename: $fname"
+---------------------------------------------------------------------------------------
+case statement - conditional statement 
+==============   ------------------------
+
+case value in
+pattern1) pattern1 operation
+	   ;; 
+pattern2) pattern2 operation
+	   ;;
+pattern3) pattern3 operation
+	   ;; 
+pattern4) pattern4 operation
+	   ;;
+...
+pattern) pattern operation
+	;;
+*)  default operation
+esac
+
+# case in esac - bash keywords 
+# -------------
+
+
+app="prometheus"				app="prometheus"
+
+if [ "$app" == "web" ]				case $app in
+then						web)  port=8000
+	port=8000				      conf="/etc/f1"
+	conf="/etc/f1"					;;
+elif [ "$app" == "dev" ]			dev)  port=4040
+then                                 Vs                 conf="/etc/f2"
+	port=4040					;;
+	conf="/etc/f2"				prometheus)  port=9090
+elif [ "$app" == "prometheus" ]				     conf="/etc/prometheus.yml"
+then								;;
+	port=9090				  *) app="demoApp"
+	conf="/etc/prometheus.yml"		     port=8080
+else						     conf="/etc/f3.cfg"
+	app="demoApp"			 	esac
+	port=8080
+	conf="/etc/f3.cfg"
+fi
+
+---------------------------------------------------------------
+bash -x filename.sh
+
++
++
++ <== debugging prompt
+---------------------------------------------------------------
+Recap
+======
+ |->Variable
+ |->Operators
+	|->Arithmetic
+	|->Relational
+
+ |->Conditional statements
+	|->if	|->case
+	   |	   =====
+	   |->if only
+	   |->if else
+	   |->if elif elif..else 
+
+
+Task-10
+--------
+In commandline =>  mkdir Demo1
+		   ls -ld Demo1
+		   mv p1.log Demo1  # move the file(p1.log) to Demo1 directory
+		   ls Demo1
+		   cd Demo1
+		   pwd
+---------------------------------
+|
+| -> Read a directory from <STDIN> 
+  |
+  -> use mkdir create a new directory
+     |
+    using $? -> test directory creation is success / failed
+					    |		|---> Directory creation is failed -> exit
+					Successfully
+ -> use ls -ld <directory-name> <-- display directory details
+ -> move the p1.log directory
+    using $? -> test p1.log file is moved to input directory 
+					|---Not--
+					OK    |->not moved to directory ->exit
+ -> ls <directory>
+ -> change the directory 
+ -> display current working directory
+----------------------------------------------------------------------------------------
+read -p "Enter a directory name:" dname
+
+mkdir $dname
+if [ $? -eq 0 ]
+then
+    echo "Directory $dname creation is Success"
+else
+    echo "Directory $dname creation is Failed"
+    exit
+fi	
+echo "About $dname details:-"
+ls -ld $dname
+		 
+mv p1.log $dname
+if [ $? -eq 0 ]
+then
+    echo "File p1.log is moved to $dname directory"
+else
+    echo "File move operation is failed"
+    exit
+fi
+
+echo "List of files from $dname directory"
+ls $dname
+
+cd $dname
+echo "Current Working directory:$(pwd)"
+sleep 2
+echo "----------- Thank you------------------"
+
+==========================================================================================================
+Logical operators
+--------------------
+ |-> Single conditional statement, test more than one condition // use logical operators
+
+Ex: port number 5001-5999
+		=========
+
+Ex: /bin/bash <or> /bin/ksh - any one shell name is matched - OK
+
+port=4500
+
+[ $port -gt 5000 ] ->(1)
+
+[ $port -lt 6000 ] ->(2)
+
+if [ $port -gt 5000 <LOGICAL-Operator> $port -lt 6000 ]
+then
+	..
+else
+	..
+fi
+
+Logical AND ->  -a
+--------------------
+Condition1	Condition2	Result
+True		True		True
+True		False		False
+False		True		False
+False		False		False
+---------------------------------------------
+Logical OR  ->  -o
+Condition1	Condition2	Result
+True		True		True
+True		False		True
+False		True		True
+False		False		False
+---------------------------------------------
+
+Logical NOT ->  ! <== Error Handling 
+
+
+[root@node2 HandsOn]# port=5678
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# [ $port -gt 5000 -a $port -lt 6000 ] ;echo $?
+0
+[root@node2 HandsOn]# port=6789
+[root@node2 HandsOn]# [ $port -gt 5000 -a $port -lt 6000 ] ;echo $?
+1
+[root@node2 HandsOn]# port=4590
+[root@node2 HandsOn]# [ $port -gt 5000 -a $port -lt 6000 ] ;echo $?
+1
+[root@node2 HandsOn]# sh_var="bash"
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# [ $sh_var == "ksh" -o $sh_var == "bash" ];echo $?
+0
+[root@node2 HandsOn]# [ 10 -eq 10 ];echo $?
+0
+[root@node2 HandsOn]# ! [ 10 -eq 10 ];echo $?
+1
+[root@node2 HandsOn]# ! [ 10 -eq 20 ];echo $?
+0
+[root@node2 HandsOn]#
+==========================================================================================
+Recap
+------
+Unix/Linux -> File,Process
+	      
+File Types
+===========
+1. Regular File (or) Ordinary file
+	
+->ASCII/Text file	- file content - user canable to read/understand (ex: p1.sh p1.log p1.csv p1.txt ...)
+	
+->ELF(or)Object file    - file content - user can't able to read/understand
+                          (ex: /bin/date , unix/linux commands)
+
+
+2. Directory (mkdir <directory>)
+
+3. Device files 
+   --------------
+	-> Character type device (ex: Keyboard,Printer,Terminal)
+	-> Block type device (ex: Storage devices - HDD,SSD,USB,CDROM)
+	 	
+4. named pipe
+   
+5. socket file 
+
+6. link file (or) softlink (or) symbolic link (or) symlink ( ln -s source target) //Adminuse cases
+									    |<--target file is softlink file
+
+file <filename> <-- determine the file type
+------------------
+
+File Test operators based on fileTypes and fileMode(operation - read/write/execute)
+===================
+Regular file  -f
+Directory file -d
+Character type device file   -c
+Block type device file       -b
+namedpipe               -p
+Socket file		-S 
+linkfile		-l (or) -h
+|
+file is existing or not ->  -e 
+
+read => -r
+write => -w
+execute =>  -x 
+
+[<space>TestOperator<space>Filename<space>] 
+---------------------------------------------
+
+Ex: Test input file is reg.file or not ?
+
+[ -f filename ] ; echo $?  // commandline
+
+if [ -f filename ]
+then
+	.....
+else
+	.....
+fi
+
+ 
+if [ -x filename ]
+then
+	echo "Yes its executable file"
+	./filename # we can run this file
+else
+	echo "Not executable"
+	..
+fi
+
+if [ -f filename -a -x filename ] <===
+
+
+
+[root@node2 HandsOn]# [ -f p1.sh ] ;echo $?
+0
+[root@node2 HandsOn]# [ -x p1.sh ] ;echo $?
+0
+[root@node2 HandsOn]# ls -l p1.sh
+-rwxr--r--. 1 root root 296 Jun  1 17:24 p1.sh
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# [ -f /etc/passwd ] ;echo $?
+0
+[root@node2 HandsOn]# ls -l /etc/passwd
+-rw-r--r--. 1 root root 2042 Nov 19  2025 /etc/passwd
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# [ -x /etc/passwd ] ; echo $?
+1
+[root@node2 HandsOn]# [ -f p1.sh -a -x p1.sh ] ;echo $?
+0
+[root@node2 HandsOn]# [ -f /etc/passwd -a -x /etc/passwd ] ;echo $?
+1
+[root@node2 HandsOn]# ls
+D1     Demo2  p10.sh  p12.sh  p14.sh  p2.sh  p4.sh  p6.sh  p8.sh
+Demo1  Demo3  p11.sh  p13.sh  p1.sh   p3.sh  p5.sh  p7.sh  p9.sh
+[root@node2 HandsOn]# ls -ld D1
+drwxr-xr-x. 2 root root 6 Jun  3 15:19 D1
+[root@node2 HandsOn]# ls -l p1.sh
+-rwxr--r--. 1 root root 296 Jun  1 17:24 p1.sh
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# [ -x D1 ];echo $?
+0
+[root@node2 HandsOn]# [ -x p1.sh ] ;echo $?
+0
+[root@node2 HandsOn]#
+
+
+Task-11
+-----------
+Write a shell script
+
+ |-> Read a filename from <STDIN>
+ |-> Test if input file is existing or not
+				|	|-->Sorry file is not exists ->exit
+				|
+				|-> Test1 => Test file is reg.file or not  => ls -l <filename>
+				    Test2 => Test file is directory or not => ls -ld <filename>
+				    Both Test1 & Test2 failed => use file command - determine the file type
+
+read -p "Enter a filename:" fname
+
+if [ -e $fname ]
+then
+	if [ -f $fname ]
+	then
+		echo "File $fname is a reg.file"
+		ls -l $fname
+	elif [ -d $fname ]
+	then
+		echo "File $fname is directory file"
+		ls -ld $fname
+	else
+		file $fname # determine file type
+	fi
+else
+    echo "Sorry file $fname is not exists"
+    exit
+fi
+
+
+Task-12
+-----------
+Modify Task-10 
+-> Test input directory is existing or not
+				|	|-->Follow Task-10
+				|
+				|
+				Directory is already exists ->exit 
+--------------------------------------------------------------------------------------------------------
+
+vi filename {enter}
+
+ line copy =>  Nyy <-- Nlines are copied 
+      paste => p (paste)
+
+ :n,m co N 
+  ---------
+  from n lines to m lines contents are copied and paste it after Nth line
+===========================================================================================
+
+Looping statements
+==================
+ |->Code block - execute more than one time
+ 
+ 1. conditional style loop ->
+			|-> test the condition -> True ->Code block will execute
+					|__False ->Code block won't execute
+	
+	while - keyword
+	-----
+
+	Rule:1 - initialization		i=0
+	Rule:2 - condition		[ $i -lt 5 ]
+        Rule:3 - arithmetic operation   i=`expr $i + 1`
+
+	Syntax:-
+	--------
+	initialization <== Rule1
+	while<space>[ Condition ] <== Rule2
+	do
+	     <code block>		
+	      arithmetic operation <== Rule3
+	done
+
+
+[root@node2 HandsOn]# i=0
+[root@node2 HandsOn]# while [ $i -lt 5 ]
+> do
+> date
+> sleep 2
+> i=`expr $i + 1`
+> done
+Wed Jun  3 19:15:04 IST 2026
+Wed Jun  3 19:15:06 IST 2026
+Wed Jun  3 19:15:09 IST 2026
+Wed Jun  3 19:15:14 IST 2026
+Wed Jun  3 19:15:16 IST 2026
+[root@node2 HandsOn]# echo $i
+5
+[root@node2 HandsOn]# [ $i -lt 5 ] ;echo $?
+1
+[root@node2 HandsOn]#
+
+	while<space>:
+	do
+	   code block
+	done
+	-------------------// infiniteloop - menu programming/ daemon scripts
+
+break - exit from loop
+continue - continue the loop 
+-------//looping keywords 
+
+ 2. collection style
+----------------------
+Syntax
+--------
+for variable in <collection>
+do
+	<code block>
+done
+
+# while do done for in  - bash keywords
+
+
+[root@node2 HandsOn]# ls *.sh
+p10.sh  p12.sh  p14.sh  p16.sh  p2.sh  p4.sh  p6.sh  p8.sh
+p11.sh  p13.sh  p15.sh  p1.sh   p3.sh  p5.sh  p7.sh  p9.sh
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# for var in `ls *.sh`
+> do
+> echo "File name:$var"
+> ls -l $var
+> echo "-------------------------------"
+> sleep 1
+> done
+File name:p10.sh
+-rwxr-xr-x. 1 root root 310 Jun  3 16:26 p10.sh
+-------------------------------
+File name:p11.sh
+-rwxr--r--. 1 root root 134 Jun  3 17:09 p11.sh
+-------------------------------
+File name:p12.sh
+-rw-r--r--. 1 root root 601 Jun  3 17:10 p12.sh
+-------------------------------
+File name:p13.sh
+-rw-r--r--. 1 root root 140 Jun  3 17:34 p13.sh
+-------------------------------
+File name:p14.sh
+-rwxr--r--. 1 root root 545 Jun  3 17:34 p14.sh
+-------------------------------
+File name:p15.sh
+-rwxr-xr-x. 1 root root 325 Jun  3 18:33 p15.sh
+-------------------------------
+File name:p16.sh
+-rwxr--r--. 1 root root 634 Jun  3 18:44 p16.sh
+-------------------------------
+File name:p1.sh
+-rwxr--r--. 1 root root 296 Jun  1 17:24 p1.sh
+-------------------------------
+File name:p2.sh
+-rwxr-xr-x. 1 root root 405 Jun  1 17:50 p2.sh
+-------------------------------
+File name:p3.sh
+-rwxr-xr-x. 1 root root 153 Jun  1 17:53 p3.sh
+-------------------------------
+File name:p4.sh
+-rwxr--r--. 1 root root 375 Jun  1 18:09 p4.sh
+-------------------------------
+File name:p5.sh
+-rwxrw-r--. 1 root root 337 Jun  1 19:16 p5.sh
+-------------------------------
+File name:p6.sh
+-rwxr--r--. 1 root root 355 Jun  3 14:58 p6.sh
+-------------------------------
+File name:p7.sh
+-rwxr--r--. 1 root root 275 Jun  3 15:36 p7.sh
+-------------------------------
+File name:p8.sh
+-rwxr--r--. 1 root root 221 Jun  3 15:45 p8.sh
+-------------------------------
+File name:p9.sh
+-rwxr--r--. 1 root root 314 Jun  3 16:04 p9.sh
+-------------------------------
+[root@node2 HandsOn]#
+
+
+[root@node2 HandsOn]# for var in RedHat Deb11 Oracle Linux 7.5
+> do
+> echo "Server name:$var"
+> done
+Server name:RedHat
+Server name:Deb11
+Server name:Oracle
+Server name:Linux
+Server name:7.5
+[root@node2 HandsOn]# for var in RedHat Deb11 "Oracle Linux 7.5" OL6 OL7
+> do
+> echo "Server name:$var"
+> done
+Server name:RedHat
+Server name:Deb11
+Server name:Oracle Linux 7.5
+Server name:OL6
+Server name:OL7
+[root@node2 HandsOn]#
+======================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
