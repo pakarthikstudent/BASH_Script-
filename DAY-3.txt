@@ -1,0 +1,1058 @@
+Recap
+------
+Variable
+ |->1. UDV 
+ |->2. Shell variable / exported variable
+ |->3. Commandline arguments <--
+ |->4. Array <---
+Operators
+Conditional statements & Looping statements
+
+while
+for
+-----
+|-> function 
+=========================================================================================
+
+read UDV <== Execution input 
+---------
+[KeyBoard]<------<STDIN>-------[ Shell Script ]---->echo --->[Monitor-STDOUT]
+
+
+
+command redirection
+--------------------
+ command 
+   | 
+  STDOUT - display to monitor
+
+
+command >resultfile 
+   |
+ STDOUT -- writing to resultfile
+
+command >resultfile - Create and Write
+ Vs
+command >>resultfile - append operation
+
+Write a shell script
+read a step value from <STDIN>
+read a count value from <STDIN>
+read a result file from <STDIN>
+using vmstat write vmstatistics report to external log file.
+
+vmstat 3 5 >>r1.log //Command line
+------ | |  |======
+---------------------------------------------
+read -p "Enter step value:" n
+read -p "Enter count value:" count
+read -p "Enter a result file:" fname
+
+vmstat $n $count >>$fname
+
+if [ $? -ne 0 ]
+then
+    echo "vmstat execution is failed"
+fi
+--------------------------------------------
+
+
+read UDV <== Execution input 
+---------
+[KeyBoard]<------<STDIN>-------[ Shell Script ]---->echo --->[Monitor-STDOUT]
+
+
+commandline arguments
+=====================
+1. run time inputs
+2. commandline arguments are called - positional parameters 
+3. $1 -> 1st argument
+   $2 -> 2nd argument
+   ..
+   $9 -> 9th argument
+
+  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+   $10 ->this is not 10th argument
+   ==
+    |-->1st argument($1) followed by 0(zero)
+  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+echo $1 $2 $3
+shift 5
+echo $1 $2 $3
+     |   |  |__8th 
+   6th  7th
+	
+  To access nth argument => ${n} 
+  ---------------------------------
+  3rd argument -> $3 same as ${3}
+
+  9th argument -> $9 same as ${9}
+
+ 10th argument ->${10}
+ 11th argument ->${11}
+		 -----
+ file: ab.sh
++------------------------------------------+
+ echo $1 $2 $3
+ echo $5 $6
++------------------------------------------+
+./ab.sh A B data 45 1.3 OL5 RHL6 {Enter}
+======= | |  |    |  |   |   |
+|      $1 $2 $3   $4 $5  $6  $7
+ScriptFile
+
+file: vmreport.sh
+---------------------------------------------
+vmstat $1 $2 >>$3
+
+if [ $? -ne 0 ]
+then
+    echo "vmstat execution is failed" >>/home/karthik/monitoringscripts/vm.log 
+fi
+--------------------------------------------
+
+cronjob
+|
+crontab -e
+30 22 * * * * /home/karthik/monitoringscripts/vmreport.sh 3 20 /home/karthik/monitoringscripts/vm.log 
+-- ==
+
+
+$# (or) ${#} - Total no.of args from commandline 
+
+$@ (or) ${@} 
+$* (or) ${*}
+-------------- // List of all the commandline args 
+
+# Task-13
+# ------------
+Write a shell script 
+Test input file is reg.file or not
+		   |		|->input file is not a reg.file
+		ls -l filename
+
+Note: commandline argument
+
+Validation: commandline args - allow single inputFile
+-------------------------------------------------------
+
+in shell commandline  $0  -> current working shell
+---------------------
+inside the script file $0 -> Working script file
+
+=========================================================================================
+iostat <delay> <count>  >>resultFile 
+------ =======  =====   =============
+# Task-14
+# ------------
+
+Write shell script
+using commandline arguments - pass delay , count and resultfile 
+redirect iostats results to resultfile
+
+Validation
+--------------
+commandline args allows 3 arguments only
+
+if [ $# -ne 3 ]
+then
+   echo "Usage: Commandline args allows 3 arguments"
+   echo "$0 <delay> <count> <resultFile>"
+   exit
+fi
+
+iostat $1 $2 >>$3 
+if [ $? -ne 0 ]
+then
+    echo "iostat is failed - `date`" >>$3
+fi
+echo "iostat execution is done - `date`" >>$3
+==========================================================================================
+mpstat
+vmstat
+iostat
+top Vs htop
+=============================================================================================
+Array
+-----
+ |->Variable - holding more than one value
+	     - each value is placed with own index
+	     - mutable 
+	     - this is not a compiler array
+		       ==============
+
+ ArrayName=() <== this is an empty array
+
+ fileInfo=("p1.sh" 345 "rwxrw-r--" root 5KB) 
+
+	  | p1.sh | 345 | rwxrw-r-- | root | 5KB |
+	  +-------+-----+-----------+------+-----+
+	  |  0th  | 1st | 2nd       | 3rd  | 4th | <== index
+	
+How to fetch/get single value from an array?
+
+	${ArrayName[index]}
+
+[root@node2 HandsOn]# fileInfo=("p1.sh" 345 "rwxrw-r--" root 5KB)
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo ${fileInfo[0]}
+p1.sh
+[root@node2 HandsOn]# echo ${fileInfo[1]}
+345
+[root@node2 HandsOn]# echo ${fileInfo[2]}
+rwxrw-r--
+[root@node2 HandsOn]# echo ${fileInfo[3]}
+root
+[root@node2 HandsOn]# echo ${fileInfo[4]}
+5KB
+
+
+
+To get all the array items
+------------------------------------------------
+	${arrayname[@]} <or> ${arrayname[*]}
+
+
+[root@node2 HandsOn]# echo ${fileInfo[@]}
+p1.sh 345 rwxrw-r-- root 5KB
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo ${fileInfo[*]}
+p1.sh 345 rwxrw-r-- root 5KB
+[root@node2 HandsOn]#
+
+
+command -> singleWord/Number  =>  variable=`command` <or> variable=$(command)
+|
+command -> more than one line
+	   more than one words
+	   ...
+	  ---------------------->  variable=(`command`) <or> variable=($(command))
+
+
+
+[root@node2 HandsOn]# ls -l p1.sh
+-rwxr--r--. 1 root root 296 Jun  1 17:24 p1.sh
+[root@node2 HandsOn]# A=(`ls -l p1.sh`)
+[root@node2 HandsOn]# echo ${A[0]}
+-rwxr--r--.
+[root@node2 HandsOn]# echo ${A[1]}
+1
+[root@node2 HandsOn]# echo ${A[2]}
+root
+[root@node2 HandsOn]# echo ${A[3]}
+root
+[root@node2 HandsOn]# echo ${A[-1]}
+p1.sh
+[root@node2 HandsOn]# echo ${A[4]}
+296
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# for var in ${A[@]}
+> do
+> echo "$var"
+> done
+-rwxr--r--.
+1
+root
+root
+296
+Jun
+1
+17:24
+p1.sh
+[root@node2 HandsOn]#
+================================================================================================
+File Handling
+----------------
+Keyboard <STDIN>
+---------------<----------------- ShellScript ---------->----------- Monitor (STDOUT)
+	read			   ======	      echo
+				     |
+				  Storage (FILE)
+
+1. Reading data from <FILE> -- script -- display to monitor
+
+2. script ->Create a newFile and Write data to FILE
+
+3. Reading data from <FILE-1> -- script -- Create a newFile and Write data to FILE-2
+
+while + redirection
+	 <  - read
+	 >  - create and write
+	 >> - append
+
+1. Reading data from <FILE> -- script -- display to monitor
+
+	while read var --(2)--
+	do
+	   <code block> --(3)--
+	done< inputFile
+	    -----(1)
+[root@node2 HandsOn]# vi r3.log
+[root@node2 HandsOn]# cat r3.log
+date
+ps
+uname
+pwd
+uptime
+[root@node2 HandsOn]# while read var
+> do
+>  echo "--->$var"
+> done< r3.log
+--->date
+--->ps
+--->uname
+--->pwd
+--->uptime
+[root@node2 HandsOn]# while read var
+> do
+>   echo "Command:$var"
+>   $var
+>   sleep 1
+> done<r3.log
+Command:date
+Thu Jun  4 16:08:53 IST 2026
+Command:ps
+    PID TTY          TIME CMD
+   1238 pts/0    00:00:00 bash
+   1636 pts/0    00:00:00 ps
+Command:uname
+Linux
+Command:pwd
+/root/HandsOn
+Command:uptime
+ 16:08:57 up  1:49,  2 users,  load average: 0.50, 0.36, 0.41
+[root@node2 HandsOn]#
+
+
+[root@node2 HandsOn]# vi r3.log
+[root@node2 HandsOn]# cat r3.log
+date
+ps
+uname
+pwd
+uptime
+[root@node2 HandsOn]# while read var
+> do
+>  echo "--->$var"
+> done< r3.log
+--->date
+--->ps
+--->uname
+--->pwd
+--->uptime
+[root@node2 HandsOn]# while read var
+> do
+>   echo "Command:$var"
+>   $var
+>   sleep 1
+> done<r3.log
+Command:date
+Thu Jun  4 16:08:53 IST 2026
+Command:ps
+    PID TTY          TIME CMD
+   1238 pts/0    00:00:00 bash
+   1636 pts/0    00:00:00 ps
+Command:uname
+Linux
+Command:pwd
+/root/HandsOn
+Command:uptime
+ 16:08:57 up  1:49,  2 users,  load average: 0.50, 0.36, 0.41
+[root@node2 HandsOn]#
+----------------------------------------------------------------------------------------------------
+2. script ->Create a newFile and Write data to FILE
+
+while read var (1) # interface to Keyboard
+do
+  code block (2)
+done >resultFile (3) 
+    Vs
+     >>resultFile
+
+
+[root@node2 HandsOn]# while read var
+> do
+> echo "--->$var"
+> date
+> done >sample.log
+test data
+file system
+process result
+compression data
+[root@node2 HandsOn]# cat sample.log
+--->test data
+Thu Jun  4 16:14:26 IST 2026
+--->file system
+Thu Jun  4 16:14:29 IST 2026
+--->process result
+Thu Jun  4 16:14:32 IST 2026
+--->compression data
+Thu Jun  4 16:14:39 IST 2026
+[root@node2 HandsOn]#
+
+-----------------------------------------------------------------------------------------
+
+3. Reading data from <FILE-1> -- script -- Create a newFile and Write data to FILE-2
+
+Syntax:-
+---------
+while read var (2)
+do
+   code block(3)
+done<inputFile  >resultFile
+	(1)	  (4)
+
+[root@node2 HandsOn]# while read var
+> do
+> echo "$var"
+> done<sample.log >s1.log
+
+# Task-15
+# ------------
+1. Create a newfile (cmdlist.log)
+2. write some linux commands one by one (ex: uname
+					     uname -r
+					     ps
+					     ..)
+Write a shellscript
+-> read a cmdlist.log file  - line by line
+-> execute command
+-> redirect command results to external log file
+
+Note: use commandline arguments
+	- pass cmdlist.log and result_file.log
+
+  Validation -> commandline argument is not empty
+	     -> commandline argument result file must be a newfile
+	     -> commandline argument input file must be a reg.file
+
+
+if [ $# -eq 0 ]
+then
+     echo "Usage: Commandline argument is empty"
+     echo "$0 <file1> <file2>"
+     exit
+fi
+
+if [ -e $2 ]
+then
+     echo "Usage: file $2 is already exists"
+     exit
+fi
+
+if ! [ -f $1 ]
+then
+     echo "Usage: file $1 is must be a regfile"
+     exit
+fi
+
+while read var
+do
+  $var
+done<$1 >$2
+
+############################################################################################
+
+   command  
+     |
+ ------------
+ |           |
+STDOUT     STDERR
+
+
+command >result # default write operation is STDOUT
+
+[root@node2 HandsOn]# uname >r1.log
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# cat r1.log
+Linux
+[root@node2 HandsOn]# unamee >err.log
+-bash: unamee: command not found
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# cat err.log
+[root@node2 HandsOn]#
+
+FileDescriptors (FD)
+--------------------
+ |-> int
+
+STDIN = 0
+STDOUT = 1
+STDERR = 2
+
+command >resultfile 
+
+command FD>resultfile
+
+uname >r1.log ---- same as -->  uname 1>r1.log 
+
+unamee >err.log --- same as --> unamee 1>err.log
+				 |
+				STDERR = FD Value is 2
+
+unameee 2>err.log 
+
+
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# uptime >r1.log 2>err.log
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+
+To redirect both results(STDOUT,STDERR) to common log file
+
+command >result.log 2>&1
+----------------------------------------------------------------------------------
+# Task-16
+# ------------
+Write a shell script
+read a command from <STDIN>
+execute input command - redirect command results to external file(result.log)
+|
+|->display command execution status to monitor.
+|                            =================
+
+Expected Result
+------------------
+Enter any linux command: ls
+ls command execution is success 
+
+Enter any linux command: abc
+abc command execution is failed - refer result.log file
+
+read -p "Enter any linux command:" cmd
+
+$cmd >>result.log 2>&1
+if [ $? -eq 0 ]
+then
+   echo "Command $cmd execution is Success"
+else
+   echo "Command $cmd execution is Failed - refer result.log file"
+fi
+=====================================================================================
+# Task-16
+# ------------
+Write a shell script
+
+Given Array => monitors=(vmstat iostat mpstat "sar -B")
+	       ------------------------------------------
+ -> iterate this array one by one - use for loop
+ 
+ -> test  # case statement 
+      -> vmstat => vmstat 2 3 - write vmstat status results to vmreport.log
+      -> iostat => iostat 2 3 - write iostat status results to ioreport.log
+      -> mpstat => mpstat 2 3 - write mpstat status results to process.log
+      -> sar -B => filter last/recent 3 lines data to pages.log file
+  |
+ -> done 
+-----------------------------------------------------------------------------
+monitors=(vmstat iostat mpstat "sar -B")
+
+n=2
+m=3
+for var in "${monitors[@]}"
+do
+  case $var in
+    vmstat) $var $n $m >vmreport.log 2>&1 ;;
+    iostat) $var $n $m >ioreport.log 2>&1 ;;
+    mpstat) $var $n $m >process.log 2>&1 ;;
+    "sar -B") $var|tail -n 3 >pages.log 2>&1 ;;
+  esac
+done
+echo "------- DONE ----------"
+-----------------------------------------------------------------------------
+1st => command
+2nd => command based set of options/arguments
+|
+3rd => automate this command with args
+                     -------------------//shell script
+			|
+			command args
+				----//variables <== read / $1 $2..$n /<File>
+			-------------
+			  |->Results -->initialize to variable/Array/Write_To_File
+
+
+grep
+find 
+sort
+tee
+sed
+awk
+---------- // filter commands 
+
+1. READ - read data from input(FILE & Command Results) 
+2. STORES - Stores inputs to buffer
+3. EXECUTE - execute filtercommand on the buffer (inputFile is not modified)
+4. DISPLAY - Display filter results to monitor
+
+grep
+====
+ -> Search pattern from <INPUT>
+			  |->command results or File
+ Syntax:-
+ ---------
+ grep -option pattern inputFile 
+
+ -i
+ -n 
+ -c
+
+[root@node2 HandsOn]# grep admin emp.csv
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# grep Sales emp.csv
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo $?
+1
+[root@node2 HandsOn]# grep -i Sales emp.csv
+101,raj,sales,pune,1000
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+[root@node2 HandsOn]# grep -n sales emp.csv
+2:101,raj,sales,pune,1000
+5:450,shan,sales,bglore,3401
+7:321,bibu,sales,hyd,5419
+[root@node2 HandsOn]# grep -ni sales emp.csv
+2:101,raj,sales,pune,1000
+5:450,shan,sales,bglore,3401
+7:321,bibu,sales,hyd,5419
+[root@node2 HandsOn]# grep -ni admin emp.csv
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# grep -c sales emp.csv
+3
+[root@node2 HandsOn]# grep -c admin emp.csv
+0
+[root@node2 HandsOn]# if [ `grep -c admin emp.csv` -eq 0  ]
+> then
+>    echo "There is no admin dept"
+> fi
+There is no admin dept
+[root@node2 HandsOn]#
+
+
+# Task-17
+# ------------
+
+Write a shell script
+|
+read a search pattern from <STDIN>
+using grep search pattern
+   | -> if search pattern is not matched => display suitable message 
+
+fname="emp.csv"
+
+read -p "Enter a search keyword:" pattern
+
+grep -i $pattern $fname
+
+if [ $? -ne 0 ]
+then
+   echo "Sorry pattern $pattern is not matched from $fname"
+fi
+-------------------------------------------------------------------
+grep -i
+     -c
+     -n
+     -v 
+     -e (or) -E <== extend pattern
+
+[root@node2 HandsOn]# grep -v sales emp.csv
+eid,ename,edept,eplace,ecost
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+542,anu,HR,mumbai,4590
+651,ram,hr,bglore,3130
+[root@node2 HandsOn]# ps -e|grep bash
+   1168 tty1     00:00:00 bash
+   1238 pts/0    00:00:01 bash
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# ps -e|grep -c bash
+2
+[root@node2 HandsOn]# ps -e|grep -vc bash
+126
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# grep -e pune -e bglore -e hyd emp.csv
+101,raj,sales,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+[root@node2 HandsOn]# grep -e sales -e devops -ie QA emp.csv
+101,raj,sales,pune,1000
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+[root@node2 HandsOn]# grep -i qa emp.csv
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# grep -E "sales|devops|QA|prod" emp.csv
+101,raj,sales,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+[root@node2 HandsOn]# grep -inE "sales|devops|QA|prod" emp.csv
+2:101,raj,sales,pune,1000
+3:102,leo,prod,bglore,2301
+4:230,raj,prod,pune,2300
+5:450,shan,sales,bglore,3401
+7:321,bibu,sales,hyd,5419
+
+
+Filter - bash,ksh,systemd,mysql,ssh from the process result
+-------
+ps
+ps -e (or) ps -A 
+
+ ps -e|grep -nE "bash|ksh|systemd|mysql|ssh" >r1.log
+[root@node2 HandsOn]# echo $?
+0
+[root@node2 HandsOn]# cat r1.log
+2:      1 ?        00:00:02 systemd
+80:    533 ?        00:00:00 systemd-journal
+81:    571 ?        00:00:00 systemd-udevd
+102:    737 ?        00:00:00 systemd-logind
+107:    775 ?        00:00:00 sshd
+117:   1124 ?        00:00:28 mysqld
+118:   1153 ?        00:00:00 systemd
+120:   1168 tty1     00:00:00 bash
+121:   1230 ?        00:00:00 sshd
+122:   1237 ?        00:00:08 sshd
+----------------------------------------------------------------------------------------------
+command | grep -option <Pattern>
+
+ps -e|grep -i <processName>
+ <or>
+ps -e|grep  <PID>
+
+Filter bluetooth module is loaded or not ?
+ lsmod | grep -i bluetooth
+
+-------------------------------------------------------------------------------------------
+
+find
+-----
+find <search-location> -name <filename> 
+-----
+
+[root@node2 HandsOn]# find / -name emp.csv
+/root/HandsOn/emp.csv
+/root/emp.csv
+[root@node2 HandsOn]# find  -name emp.csv
+./emp.csv
+[root@node2 HandsOn]# find -name "*.log"
+./Demo1/p1.log
+./Demo2/p1.log
+./Demo4/p1.log
+
+[root@node2 HandsOn]# find /etc -name "*.sh"|wc -l
+16
+
+find / -name "*.sh"|wc -l
+
+We can search file - based file Type
+=======================================
+find <search> -type <fileTestOperator>
+
+
+[root@node2 HandsOn]# find -type d
+.
+./D1
+./Demo1
+./Demo2
+./Demo3
+./Demo4
+[root@node2 HandsOn]# find -type f
+./p1.sh
+./p2.sh
+./p3.sh
+./p4.sh
+..
+./process.log
+[root@node2 HandsOn]# find /etc -type d|wc -l
+309
+[root@node2 HandsOn]#
+--------------------------------------------------------------------------
+project_files = (`find /project "*.c"`)
+c=0
+for var in ${project_files[@]}
+do
+	gcc -o "obj$c" $var  <== 
+	"./obj$c" >>r1.log 2>&1
+	c=`expr $c + 1`
+done 
+------------------------------------------------------
+
+sort 
+====
+[root@node2 HandsOn]# cat depts.log
+sales
+prod
+devops
+admin
+test
+qa
+crm
+[root@node2 HandsOn]# sort depts.log
+admin
+crm
+devops
+prod
+qa
+sales
+test
+[root@node2 HandsOn]# sort -r depts.log
+test
+sales
+qa
+prod
+devops
+crm
+admin
+[root@node2 HandsOn]#
+
+
+[root@node2 HandsOn]# sort costs
+123456
+23
+4320
+45
+4590
+5490
+78900
+98
+[root@node2 HandsOn]# sort -n costs
+23
+45
+98
+4320
+4590
+5490
+78900
+123456
+[root@node2 HandsOn]# sort -nr costs
+123456
+78900
+5490
+4590
+4320
+98
+45
+23
+[root@node2 HandsOn]#
+
+
+[root@node2 HandsOn]# cat emp.csv
+101,raj,sales,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sort -t, -k 2 emp.csv
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+101,raj,sales,pune,1000
+651,ram,hr,bglore,3130
+450,shan,sales,bglore,3401
+[root@node2 HandsOn]# sort -t, -k 3 emp.csv
+651,ram,hr,bglore,3130
+542,anu,HR,mumbai,4590
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+101,raj,sales,pune,1000
+[root@node2 HandsOn]# sort -t, -k 5 emp.csv
+101,raj,sales,pune,1000
+230,raj,prod,pune,2300
+102,leo,prod,bglore,2301
+651,ram,hr,bglore,3130
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+[root@node2 HandsOn]# sort -t, -rk 5 emp.csv
+321,bibu,sales,hyd,5419
+542,anu,HR,mumbai,4590
+450,shan,sales,bglore,3401
+651,ram,hr,bglore,3130
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+101,raj,sales,pune,1000
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sort -t, -k 5 emp.csv
+101,raj,sales,pune,1000
+230,raj,prod,pune,2300
+102,leo,prod,bglore,2301
+651,ram,hr,bglore,3130
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sort -t, -nk 5 emp.csv
+101,raj,sales,pune,1000
+230,raj,prod,pune,2300
+102,leo,prod,bglore,2301
+651,ram,hr,bglore,3130
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sort -t, -nrk 5 emp.csv
+321,bibu,sales,hyd,5419
+542,anu,HR,mumbai,4590
+450,shan,sales,bglore,3401
+651,ram,hr,bglore,3130
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+101,raj,sales,pune,1000
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+
+
+
+[root@node2 HandsOn]# ls -l *.log
+-rw-r--r--. 1 root root    81 Jun  4 16:25 cmdlist.log
+-rw-r--r--. 1 root root   334 Jun  4 14:45 d1.log
+-rw-r--r--. 1 root root    36 Jun  4 18:46 depts.log
+-rw-r--r--. 1 root root     0 Jun  4 17:07 err.log
+-rw-r--r--. 1 root root  1070 Jun  4 17:43 ioreport.log
+-rw-r--r--. 1 root root   762 Jun  4 16:33 output.log
+-rw-r--r--. 1 root root   310 Jun  4 17:43 pages.log
+-rw-r--r--. 1 root root   582 Jun  4 17:43 process.log
+-rw-r--r--. 1 root root   639 Jun  4 18:44 r1.log
+-rw-r--r--. 1 root root 11557 Jun  4 15:42 r2.log
+-rw-r--r--. 1 root root    25 Jun  4 16:07 r3.log
+-rw-r--r--. 1 root root   391 Jun  4 17:23 result.log
+-rw-r--r--. 1 root root   186 Jun  4 16:19 s1.log
+-rw-r--r--. 1 root root   186 Jun  4 16:14 sample.log
+-rw-r--r--. 1 root root   411 Jun  4 17:43 vmreport.log
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# ls -l *.log|sort -t" " -nk 5
+-rw-r--r--. 1 root root     0 Jun  4 17:07 err.log
+-rw-r--r--. 1 root root    25 Jun  4 16:07 r3.log
+-rw-r--r--. 1 root root    36 Jun  4 18:46 depts.log
+-rw-r--r--. 1 root root    81 Jun  4 16:25 cmdlist.log
+-rw-r--r--. 1 root root   186 Jun  4 16:14 sample.log
+-rw-r--r--. 1 root root   186 Jun  4 16:19 s1.log
+-rw-r--r--. 1 root root   310 Jun  4 17:43 pages.log
+-rw-r--r--. 1 root root   334 Jun  4 14:45 d1.log
+-rw-r--r--. 1 root root   391 Jun  4 17:23 result.log
+-rw-r--r--. 1 root root   411 Jun  4 17:43 vmreport.log
+-rw-r--r--. 1 root root   582 Jun  4 17:43 process.log
+-rw-r--r--. 1 root root   639 Jun  4 18:44 r1.log
+-rw-r--r--. 1 root root   762 Jun  4 16:33 output.log
+-rw-r--r--. 1 root root  1070 Jun  4 17:43 ioreport.log
+-rw-r--r--. 1 root root 11557 Jun  4 15:42 r2.log
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# ls -l *.log|sort -t" " -nrk 5
+-rw-r--r--. 1 root root 11557 Jun  4 15:42 r2.log
+-rw-r--r--. 1 root root  1070 Jun  4 17:43 ioreport.log
+-rw-r--r--. 1 root root   762 Jun  4 16:33 output.log
+-rw-r--r--. 1 root root   639 Jun  4 18:44 r1.log
+-rw-r--r--. 1 root root   582 Jun  4 17:43 process.log
+-rw-r--r--. 1 root root   411 Jun  4 17:43 vmreport.log
+-rw-r--r--. 1 root root   391 Jun  4 17:23 result.log
+-rw-r--r--. 1 root root   334 Jun  4 14:45 d1.log
+-rw-r--r--. 1 root root   310 Jun  4 17:43 pages.log
+-rw-r--r--. 1 root root   186 Jun  4 16:19 s1.log
+-rw-r--r--. 1 root root   186 Jun  4 16:14 sample.log
+-rw-r--r--. 1 root root    81 Jun  4 16:25 cmdlist.log
+-rw-r--r--. 1 root root    36 Jun  4 18:46 depts.log
+-rw-r--r--. 1 root root    25 Jun  4 16:07 r3.log
+-rw-r--r--. 1 root root     0 Jun  4 17:07 err.log
+[root@node2 HandsOn]#
+
+-----------------------------------------------
+
+head
+tail
+more
+less - page by page <== (Home End PgUp PgDn)
+----
+----------// View the command results
+
+head -> top to bottom - default - 10lines
+head -n <N>
+
+display top 10 large file 
+---------------------------
+ls -l|sort -t" " -nrk 5|head 
+
+---------------------------------------------------------------------
+grep sales emp.csv >r1.log
+
+
+command >resultFile # redirecting command results to externalfile
+                    # we can't see the command results to monitor
+Vs
+
+command | tee resultFile # Create a new resultFile and redirect command results to resultFile
+			 # Display to monitor 
+
+
+
+[root@node2 HandsOn]# grep sales emp.csv |tee s1.csv
+101,raj,sales,pune,1000
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# ps|tee s1.csv
+    PID TTY          TIME CMD
+   1238 pts/0    00:00:01 bash
+   2423 pts/0    00:00:00 ps
+   2424 pts/0    00:00:00 tee
+[root@node2 HandsOn]# cat s1.csv
+    PID TTY          TIME CMD
+   1238 pts/0    00:00:01 bash
+   2423 pts/0    00:00:00 ps
+   2424 pts/0    00:00:00 tee
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# grep sales emp.csv |tee -a s1.csv
+101,raj,sales,pune,1000
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# cat s1.csv
+    PID TTY          TIME CMD
+   1238 pts/0    00:00:01 bash
+   2423 pts/0    00:00:00 ps
+   2424 pts/0    00:00:00 tee
+101,raj,sales,pune,1000
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+
+------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
