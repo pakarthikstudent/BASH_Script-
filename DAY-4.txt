@@ -1,0 +1,885 @@
+username@hostname~]$ <command> 
+
+username@hostname~]$ <command> -option(s)
+
+username@hostname~]$ <command> -option(s) arg1 arg2 arg3 ... argN 
+
+username@hostname~]$ man <command> 
+=======================================================================
+username@hostname~]$ <command> -option(s) arg1 arg2 arg3 ... argN  ->display to monitor(STDOUT)
+		      Vs
+username@hostname~]$ <command> -option(s) arg1 arg2 arg3 ... argN  > resultFile
+=======================================================================
+sed
+awk
+function
+network commands
+ssh commands
+|
+Here document - external application
+-------------------------------------------------------------------------------------------------
+grep   - search a pattern from input
+-----
+grep -option pattern input
+
+pattern -> Text (or) str (ex: sales 45690.42  " ")
+Action  -> print / display
+
+sed 
+----
+sed -option 'patternAction' input
+
+pattern
+-------
+	1. LineNumber	2./Text/
+Action(s)
+----------
+	print(p)  write(w)  delete(d) execute(e) insert(i) append(a) substitute(s)
+
+record based (or) line based - operation
+
+sed internal steps
+==================
+1. READ - read the data from <INPUT>
+2. STORES - Stores data to buffer
+3. EXECUTE - execute sed command on the buffer space
+4. DISPLAY - Action - then buffer will be empty
+
+print 3rd line content from emp.csv file => sed -option 'patternAction' input
+-----------------------------------------
+
+sed -option '3p' emp.csv
+ emp.csv
++----------+           Buffer			Monitor
+| 1. data1 |  ----> +-----------+	 +-----------------+
+| 2. data2 |        | 1. data1		 |  data1	
+| 3. data3 |        | 2. data2           |  data2
+| 4. data4 |        | 3. data3 ------>       data3
++----------+        | 4. data4		     data3
+		    +-----------+	     data4
+	|				 +------------------+
+        |________________________________________ //print(p) and write(w)
+		-n <-- p,w
+
+
+
+sed -n '3p' emp.csv
+data3
+
+sed -option 'nAction' input
+	     |
+	     |-> nth line
+
+sed -option 'n,mAction'
+	     ---
+	     |->from nth line to mth line
+		     --------    ========
+sed -n '2,5p' inputFile
+       ======
+from 2nd line to 5th line
+    ---------    ---------
+
+To display last line => $
+
+=======================================================================
+print(p)
+-n option is required
+
+sed -n 'np' input
+sed -n 'n,mp' input
+
+print 3rd line from inputfile =>  sed -n '3p' inputFile
+
+print nth line and mth line (not range)
+=======================================
+ |-> -e nAction   -e mAction 
+
+print 3rd line and 5th line =>  sed -n -e '3p' -e '5p' inputFile
+
+
+
+[root@node2 HandsOn]# sed -n '3p' emp.csv
+230,raj,prod,pune,2300
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sed -n '5p' emp.csv
+542,anu,HR,mumbai,4590
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sed -n '3,5p' emp.csv
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sed -n -e '3p' -e '5p' emp.csv
+230,raj,prod,pune,2300
+542,anu,HR,mumbai,4590
+[root@node2 HandsOn]# cat >IP
+-----Header---
+Data1
+Data2
+Data3
+-----Footer---
+^C
+[root@node2 HandsOn]# cat IP
+-----Header---
+Data1
+Data2
+Data3
+-----Footer---
+[root@node2 HandsOn]# # How to delete and Header and Footer line
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sed -e '1d' -e '$d' IP
+Data1
+Data2
+Data3
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sed -n -e '2,4p' IP
+Data1
+Data2
+Data3
+[root@node2 HandsOn]#
+
+
+Write(w)
+=========
+sed -n '<Pattern>Action<space>ResultFile' inputFile
+
+sed -n '3w r1.log' IP  --- same as --   sed -n '3p' IP >r1.log
+					=======================
+
+[root@node2 HandsOn]# sed -n '3w r1.log' emp.csv
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sed -n '3,5w r2.log' emp.csv
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sed -n -e '3w three.txt' -e '5w five.txt' emp.csv
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# cat r1.log
+230,raj,prod,pune,2300
+[root@node2 HandsOn]# cat r2.log
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+[root@node2 HandsOn]# cat three.txt
+230,raj,prod,pune,2300
+[root@node2 HandsOn]# cat five.txt
+542,anu,HR,mumbai,4590
+[root@node2 HandsOn]#
+------------------------------------------------------------
+delete(d)
+=========
+opp.of print(p) action
+
+IP		Buffer		Monitor
+-----		-------		---------
+data1		data1		data1
+data2  		data2 <--
+data3		data3		data3
+------		------
+delete 2nd line =>
+Vs
+print 2nd line -> data2	
+
+[root@node2 HandsOn]# free
+              total        used        free      shared  buff/cache   available
+Mem:        3818580      700952     2716032        8732      401596     2872416
+Swap:       4882428           0     4882428
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# free|sed '1d'
+Mem:        3818580      700928     2716032        8732      401620     2872440
+Swap:       4882428           0     4882428
+[root@node2 HandsOn]# clear
+[root@node2 HandsOn]#
+
+-----------------------------------------------------
+sed -option '/Text/Action' input
+
+print(p)
+write(p)
+--------- -n option
+
+
+
+[root@node2 HandsOn]# # sed -n 'n,mAction' input
+[root@node2 HandsOn]# #        -----------
+[root@node2 HandsOn]# sed -n '/leo/,/bibu/p' emp.csv
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sed -n '/leo/,/bibu/w r1.log' emp.csv
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# cat r1.log
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sed '/leo/,/bibu/d' emp.csv
+101,raj,sales,pune,1000
+651,ram,hr,bglore,3130
+[root@node2 HandsOn]#
+------------------------------------------------------------------------------------
+insert (i)
+append (a)
+[root@node2 HandsOn]# cat -n IP
+     1  Data1
+     2  Data2
+     3  Data3
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# sed '2i DATA-ABC' IP
+Data1
+DATA-ABC
+Data2
+Data3
+[root@node2 HandsOn]# sed '2a DATA-ABC' IP
+Data1
+Data2
+DATA-ABC
+Data3
+[root@node2 HandsOn]#
+------------------------------------------------------------------------------------
+substitute(s)
+--------------
+sed 's/oldpattern/replace/' input
+     
+
+
+
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo "101,raj,sales,pune"|sed 's/sales/QA/'
+101,raj,QA,pune
+[root@node2 HandsOn]# echo "101,raj,sales,pune"|sed 's/prod/QA/'
+101,raj,sales,pune
+[root@node2 HandsOn]# echo "101,sales,raj,sales,pune,sales"|sed 's/sales/QA/'
+101,QA,raj,sales,pune,sales
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo "101,sales,raj,sales,pune,sales"|sed 's/sales/QA/g'
+101,QA,raj,QA,pune,QA
+[root@node2 HandsOn]# echo "101,SALES,raj,sales"|sed 's/sales/QA/'
+101,SALES,raj,QA
+[root@node2 HandsOn]# echo "101,SALES,raj,sales"|sed 's/sales/QA/g'
+101,SALES,raj,QA
+[root@node2 HandsOn]# echo "101,SALES,raj,sales"|sed 's/sales/QA/i'
+101,QA,raj,sales
+[root@node2 HandsOn]# echo "101,SALES,raj,sales"|sed 's/sales/QA/ig'
+101,QA,raj,QA
+[root@node2 HandsOn]#
+
+
+
+[root@node2 HandsOn]# echo "101,sales,raj,sales,pune,sales"|sed 's/sales/QA/g'
+101,QA,raj,QA,pune,QA
+[root@node2 HandsOn]# echo "101,SALES,raj,sales"|sed 's/sales/QA/'
+101,SALES,raj,QA
+[root@node2 HandsOn]# echo "101,SALES,raj,sales"|sed 's/sales/QA/g'
+101,SALES,raj,QA
+[root@node2 HandsOn]# echo "101,SALES,raj,sales"|sed 's/sales/QA/i'
+101,QA,raj,sales
+[root@node2 HandsOn]# echo "101,SALES,raj,sales"|sed 's/sales/QA/ig'
+101,QA,raj,QA
+
+[root@node2 HandsOn]# sed 's/sales/****/' emp.csv
+101,raj,****,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,****,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,****,hyd,5419
+651,ram,hr,bglore,3130
+[root@node2 HandsOn]# ps
+    PID TTY          TIME CMD
+   1242 pts/0    00:00:01 bash
+   1488 pts/0    00:00:00 ps
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# ps|sed 's/bash/ksh/'
+    PID TTY          TIME CMD
+   1242 pts/0    00:00:01 ksh
+   1489 pts/0    00:00:00 ps
+   1490 pts/0    00:00:00 sed
+[root@node2 HandsOn]#
+
+-----------------------------------------------------------------
+
+[root@node2 HandsOn]# echo "101,raj,sales,pune"|sed 's/sales/***/'
+101,raj,***,pune
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo "101,raj,sales,pune"|sed 's/sales//'
+101,raj,,pune
+[root@node2 HandsOn]# echo "101,raj,sales,pune"|sed 's/sales,//'
+101,raj,pune
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# v=`echo "101,raj,sales,pune"|sed 's/sales,//'`
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo $v
+101,raj,pune
+[root@node2 HandsOn]# echo "root:usr:bin:bash:x:0:admin"|sed 's/:/ /'
+root usr:bin:bash:x:0:admin
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo "root:usr:bin:bash:x:0:admin"|sed 's/:/ /g'
+root usr bin bash x 0 admin
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# A=(`echo "root:usr:bin:bash:x:0:admin"|sed 's/:/ /g'`)
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo ${A[0]}
+root
+[root@node2 HandsOn]# echo ${A[1]}
+usr
+[root@node2 HandsOn]#
+
+-----------------------------------------------------------------
+grep   - search a pattern from input
+-----
+grep -option pattern input
+
+pattern -> Text (or) str (ex: sales 45690.42  " ")
+Action  -> print / display
+
+sed 
+----
+sed -option 'patternAction' input
+
+pattern
+-------
+	1. LineNumber	2./Text/
+Action(s)
+----------
+	print(p)  write(w)  delete(d) execute(e) insert(i) append(a) substitute(s)
+awk
+---
+awk -option 'patternAction' input
+	
+pattern -> Text (or) str /Text/ <== like sed style
+Action  -> print - command 
+
+awk internal operations
+--------------------------
+awk -option '/pattern/{Action}' input
+    -F<sep>
+1. READ - read data from <INPUT> ->stored to buffer
+2. SPLIT - on the buffer -> split each line into multiple columns based on delimiter (default sep is space) 
+3. SEARCH
+4. ACTION
+				awk -F: '/bash/{print}' IP
+IP
+----------------
+userA:bin:bash
+userB:bin:ksh
+userC:bin:bash
+-----------------
+
+		1 userA:bin:bash
+		------------------
+		2 userB:bin:ksh
+		------------------
+		3 userC:bin:bash
+		------------------
+	-F<sep>	
+		1 userA|bin |bash
+		-------|----|-----
+		2 userB|bin |ksh
+		-------|----|-----
+		3 userC|bin |bash
+		-------|----|-----
+
+		
+		NR  $1    $2   $3 <== awk - special variables 
+		1 userA|bin |bash
+		-------|----|-----
+		2 userB|bin |ksh
+		-------|----|-----
+		3 userC|bin |bash
+		-------|----|-----
+		  |----- $0 -----| 
+		
+awk -F: '/bash/{print NR,$1,$3}' IP    Vs grep bash IP
+ 
+1 userA bash
+3 userC bash
+---    -- //each field separator is space 
+
+awk -> $NF <== last column
+-----------------------------
+default input field and output field separator is space
+	----------	======================
+	-F<sep>			OFS=<sep>
+				---//variable
+
+
+
+[root@node2 HandsOn]# free
+              total        used        free      shared  buff/cache   available
+Mem:        3818580      699672     2716032        8732      402876     2873688
+Swap:       4882428           0     4882428
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# free |sed '1d'
+Mem:        3818580      699672     2716032        8732      402876     2873688
+Swap:       4882428           0     4882428
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# free |sed '1d'|awk '{print $1}'
+Mem:
+Swap:
+[root@node2 HandsOn]# ps
+    PID TTY          TIME CMD
+   1242 pts/0    00:00:01 bash
+   1556 pts/0    00:00:00 ps
+[root@node2 HandsOn]# ps|awk '{print $4}'
+CMD
+bash
+ps
+awk
+[root@node2 HandsOn]# ps|awk '{print $NF}'
+CMD
+bash
+ps
+awk
+[root@node2 HandsOn]# awk -F, '{print $1,$NF}' emp.csv
+101 1000
+102 2301
+230 2300
+450 3401
+542 4590
+321 5419
+651 3130
+[root@node2 HandsOn]# awk -F, '{print $1,$2,$NF}' emp.csv
+101 raj 1000
+102 leo 2301
+230 raj 2300
+450 shan 3401
+542 anu 4590
+321 bibu 5419
+651 ram 3130
+[root@node2 HandsOn]# awk -F, '{print $2,$1,$NF}' emp.csv
+raj 101 1000
+leo 102 2301
+raj 230 2300
+shan 450 3401
+anu 542 4590
+bibu 321 5419
+ram 651 3130
+[root@node2 HandsOn]# ps -e|awk '/bash/{print}'
+   1140 tty1     00:00:00 bash
+   1242 pts/0    00:00:01 bash
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# ps -e|awk '/bash/{print $NF,$1}'
+bash 1140
+bash 1242
+[root@node2 HandsOn]# ps -e|awk '/bash/{OFS="-";print $NF,$1}'
+bash-1140
+bash-1242
+[root@node2 HandsOn]# awk -F, '/sales/{print NR,$1,$2,$NF}' emp.csv
+1 101 raj 1000
+4 450 shan 3401
+6 321 bibu 5419
+[root@node2 HandsOn]# awk -F, '/sales/{OFS=":";print NR,$1,$2,$NF}' emp.csv
+1:101:raj:1000
+4:450:shan:3401
+6:321:bibu:5419
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# awk -F, '/sales/{OFS="\t";print NR,$1,$2,$NF}' emp.csv
+1       101     raj     1000
+4       450     shan    3401
+6       321     bibu    5419
+[root@node2 HandsOn]#
+
+
+awk supports 
+ arithmetic
+ relational
+ logical 
+ --------------// like C style program
+
+
+[root@node2 HandsOn]# expr 10 + 20
+30
+[root@node2 HandsOn]# expr 10 + 20.0
+expr: non-integer argument
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo $((10+20.0))
+-bash: 10+20.0: syntax error: invalid arithmetic operator (error token is ".0")
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo 10 20.0|awk '{print $1+$2}'
+30
+[root@node2 HandsOn]# echo 10 20.4|awk '{print $1+$2}'
+30.4
+[root@node2 HandsOn]# echo 10 20.4|awk '{print $1*$2}'
+204
+[root@node2 HandsOn]# r=`echo 10 20.4|awk '{print $1*$2}'`
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# echo $r
+204
+[root@node2 HandsOn]#
+
+
+[root@node2 HandsOn]# awk -F, '/sales/{print NR,$2,$NF,$NF * 0.18}' emp.csv
+1 raj 1000 180
+4 shan 3401 612.18
+6 bibu 5419 975.42
+[root@node2 HandsOn]# awk -F, '/sales/{OFS=":";print NR,$2,$NF,$NF * 0.18}' emp.csv
+1:raj:1000:180
+4:shan:3401:612.18
+6:bibu:5419:975.42
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# A=(`awk -F, '/sales/{OFS=":";print NR,$2,$NF,$NF * 0.18}' emp.csv `)
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# for var in ${A[@]}
+> do
+> echo "$var"
+> sleep 1
+> done
+1:raj:1000:180
+4:shan:3401:612.18
+6:bibu:5419:975.42
+[root@node2 HandsOn]#
+
+[root@node2 HandsOn]# awk -F, '/sales/{print NR,$2,$NF}' emp.csv
+1 raj 1000
+4 shan 3401
+6 bibu 5419
+[root@node2 HandsOn]# awk -F, '/sales/{print NR,$2,$NF,$NF * 0.18}' emp.csv
+1 raj 1000 180
+4 shan 3401 612.18
+6 bibu 5419 975.42
+[root@node2 HandsOn]# awk -F, '/sales/{OFS=":";print NR,$2,$NF,$NF * 0.18}' emp.csv
+1:raj:1000:180
+4:shan:3401:612.18
+6:bibu:5419:975.42
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# A=(`awk -F, '/sales/{OFS=":";print NR,$2,$NF,$NF * 0.18}' emp.csv `)
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# for var in ${A[@]}
+> do
+> echo "$var"
+> sleep 1
+> done
+1:raj:1000:180
+4:shan:3401:612.18
+6:bibu:5419:975.42
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# awk -F, '/sales/{print}' emp.csv
+101,raj,sales,pune,1000
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+[root@node2 HandsOn]#
+[root@node2 HandsOn]#
+[root@node2 HandsOn]# awk -F, '$3 == "sales"{print}' emp.csv
+101,raj,sales,pune,1000
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+
+
+[root@node2 HandsOn]# awk -F, '$NF >3000{print NR,$1,$2,$NF}' emp.csv
+4 450 shan 3401
+5 542 anu 4590
+6 321 bibu 5419
+7 651 ram 3130
+[root@node2 HandsOn]# awk -F, '$NF >3000{print NR,$1,$2,$3,$NF}' emp.csv
+4 450 shan sales 3401
+5 542 anu HR 4590
+6 321 bibu sales 5419
+7 651 ram hr 3130
+[root@node2 HandsOn]# awk -F, '$NF <3000{print NR,$1,$2,$3,$NF}' emp.csv
+1 101 raj sales 1000
+2 102 leo prod 2301
+3 230 raj prod 2300
+[root@node2 HandsOn]# awk -F, '$NF >3000 && $NF<5000{print NR,$1,$2,$3,$NF}' emp.csv
+4 450 shan sales 3401
+5 542 anu HR 4590
+7 651 ram hr 3130
+[root@node2 HandsOn]#
+
+------------------------------------------------------------------------------------
+Function 
+-----------------
+ -> Code block
+ -> set of /group of statements (or) collection of commands // single block
+
+-----------------------------------//p1.sh
+echo "List of files:"
+ls
+echo "Current process:"
+ps
+echo "Memory:"
+free
+echo # empty line
+echo "List of files:"
+ls
+echo "Current process:"
+ps
+echo "Memory:"
+free
+echo "Current process:"
+ps
+echo "Memory:"
+free
+-----------------------------------//p1.sh
+
+function functionName()
+{
+  ......
+  ......
+}
+functionName  # Simple Function Call
+
+------------------------------------//p2.sh
+function list_of_files(){
+	echo "List of files:"
+	ls
+}
+process(){
+	echo "Current process"
+	ps
+}
+memory(){
+	echo "Current state of memory"
+	free -m
+}
+
+list_of_files # simple function Call
+...
+process       # simple function Call
+..
+list_of_files # simple function Call
+..
+memory        # simple function Call
+-------------------------------------
+
+
+
+$1 $2 $3...$n <-- commandline args
+
+in awk -> $1 $2 $3 <-- field value (awk variable)
+
+inside function --> $1 $2 $3 <--- function call arguments - not commandline arguments
+
+
++-----------------------------------------------------+ // p3.sh
+| echo $1 $2 $3
+|
+| ps|awk '{print $1,$2,$3}'
+|
+| function f1(){
+|     echo "this is f1 block"
+|     echo $1 $2 $3
+| }
+|
+|f1 file1 file2 file3  # function call with args
+|f1 # simple function call - there is no argument passing
+|echo $1 $2 $3
+|
++-----------------------------------------------------+
+  ./p3.sh 120 300 report.log
+
+==========================================================================================
+
+	Login:....
+	password:....
+	|
+	shell(bash) --> /etc/profile - read & execute 
+	|
+
+root@host~]# ls					userA@host~]$ ls
+
+
+root@host~]# ls	-a				userA@host~]$ ls -a
+.bash_rc					.bash_rc
+.bash_history					.bash_history
+..
+root@host~]# vi .bashrc				vi .bashrc {Enter}
+						
+export DB="/usr/bin/oracle"			export PYTHONPATH=/home/userA/project
+:wq						export API="apitoken"
+|						mysysinfo(){
+root@host~]# source .bashrc <or> . .bashrc 		uname -rs
+							hostname
+root@host~]# echo $DB				}
+/usr/bin/oracle					export -f mysysinfo
+						:wq 
+
+						userA@host~]$ source .bashrc (or) . .bashrc 
+-----------------------------------------------------------------------------------------------------
+Linux network config files - root user only can do
+-----------------------------
+/etc/sysconfig/network-scripts/...
+
+      A							B
+  +--------------+				+----------------+
+  | host01       |				| host02	 |
+  +--------------+				+----------------+
+   127.0.0.1
+						
+To configure IP
+---------------
+1. configuration file - vi /etc/sysconfig/network-scripts/ifcf-eth0
+				...
+			:wq
+			systemctl restart network
+2. GUI - NetworkManager
+3. nmcli 
+
+      A							B
+  +--------------+				+----------------+
+  | host01       |				| host02	 |
+  +--------------+				+----------------+
+   127.0.0.1					127.0.0.1
+   192.168.1.5					192.168.2.6
+
+
+/etc/hosts 
+<FQDN> <IP-Address>  <alias>
+host02.example.com  192.168.2.6  host02
+
+root@host01~]# ping host02.example.com
+		<or>
+	       ping 192.168.2.6
+		<or>
+	      ping host02
+		
+
+
+
+      A							B
+  +--------------+				+----------------+
+  | host01       |  <--------->			| host02	 |
+  +--------------+				+----------------+
+   127.0.0.1					127.0.0.1
+   192.168.1.5					192.168.2.6
+
+
+/etc/hosts 
+<FQDN> <IP-Address>  <alias>
+host02.example.com  192.168.2.6  host02
+
+ssh host02.example.com (or) 192.168.2.6 (or) host02 {Enter}
+			yes
+			....
+Enter a password: <host02 password>
+...
+root@host02~]# ...
+
+--------------------------------------------------------------------------------------------
+
+
+[root@node2 ~]# ssh root@krosumlabs
+root@krosumlabs's password:
+Last login: Fri Jun  5 17:45:26 2026 from 192.168.1.15
+[root@krosumlabs ~]#
+[root@krosumlabs ~]# exit
+logout
+Connection to krosumlabs closed.
+[root@node2 ~]# hostname
+node2
+[root@node2 ~]# ssh root@krosumlabs "hostname"
+root@krosumlabs's password:
+krosumlabs
+[root@node2 ~]# df -Th /
+Filesystem     Type  Size  Used Avail Use% Mounted on
+/dev/sda2      xfs    12G  9.0G  2.3G  80% /
+[root@node2 ~]#
+[root@node2 ~]# ssh root@krosumlabs "df -Th /"
+root@krosumlabs's password:
+Filesystem     Type  Size  Used Avail Use% Mounted on
+/dev/sda2      xfs    70G  3.2G   67G   5% /
+[root@node2 ~]#
+
+----------------------------------------------------------------------------------------------
+   p1.sh
+ +------------------+
+ | ...
+ | ...
+ | ...
+ | ...
+ |  -------------------------------->python code ....
+ |    ---------<------------------------------------
+ | ....
+ | ------------------------->------- external DB 
+ |					...
+ |	--------<------------------
+ |
+ | ---------->----------------  remote node (ssh) - execute some set of commands - get the command results
+ |												    |
+ |	-------<------------------------------------------------------------------------------------
+ |
+ +---------------------
+
+Here-document
+
+command <<Flag
+  ....
+  ....
+  ....
+Flag
+
+root@host~]# mysql -u root -p .. {Enter}
+...
+mysql> Query
+mysql> ...
+
+---------------
+mysql -u -p"<password>"<<EOF
+	create database demo1;
+	use demo1;
+	create table t1(id NUMBER,name Text);
+	...
+	...
+EOF
+---------------------------------------------------------------------------------
+
+|--------------> |.....|
+  |->expect 
+  |->IaC
+	|->ansible 
+
+
+
+#!/usr/bin/expect
+
+spawn ./agent_install.sh
+
+expect "Do you want to continue?"
+send "yes\r"
+
+expect "Enter storage size"
+send "200\r"
+
+expect "Confirm installation"
+send "yes\r"
+
+expect eof
+---------------
+
+SERVER="10.10.10.20"
+USER="admin"
+
+# copy agent_install.sh script to remote m/c 
+scp agent_install.sh ${USER}@${SERVER}:/tmp/
+
+# Install agent remotely
+ssh ${USER}@${SERVER} <<EOF
+cd /tmp
+
+./agent_install.sh <<INPUT
+yes
+200
+/opt/agent
+yes
+INPUT
+EOF
+----------------------------------------------------------------------------------
+
+
+
+
+
+
